@@ -6,12 +6,17 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserResponse } from 'src/types/type';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { loginUser } from 'src/user/dto/login-user.dto';
 import { UserService } from 'src/user/user.service';
+import { ROLES_KEY, Roles } from './decorators/roles.decorator';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from './guard/roles.guard';
+import { Role } from 'src/interfaces/role.enum';
+import { Auth } from './decorators/auth.decorator';
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -26,23 +31,19 @@ export class AuthController {
       loginDto.email,
       loginDto.password,
     );
-    console.log(user);
 
     if (!user) {
       throw new HttpException('', HttpStatus.BAD_REQUEST);
     }
-    const payload = { sub: user.id };
-    console.log(payload);
-
+    const payload = { sub: user.id, email: user.email };
     const accessToken = this.jwtservice.sign(payload);
 
     const { ...rest } = user;
-    return { accessToken, user: rest };
+    return { accessToken, user: rest.email };
   }
-
   @Post('register')
+  @Auth(Role.Admin)
   async create(@Body() createuserdto: CreateUserDto) {
-    console.log('register', createuserdto);
     if (createuserdto.password !== createuserdto.confirmPassword) {
       throw new BadRequestException({
         statusCode: 400,
@@ -54,7 +55,7 @@ export class AuthController {
     const user = await this.userService.create(createuserdto);
     console.log(user);
 
-    const { ...result } = user;
-    return result as UserResponse;
+    const { email, name, role } = user;
+    return { email, name, role };
   }
 }

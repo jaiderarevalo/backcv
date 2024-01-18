@@ -19,6 +19,8 @@ export class User {
   email: string;
   @Column()
   password: string;
+  @Column()
+  role: string;
   @BeforeInsert()
   async hashPassword() {
     const salt = await bcrypt.genSalt(10);

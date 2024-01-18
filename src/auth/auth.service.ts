@@ -17,7 +17,7 @@ export class AuthService {
     if (!user) {
       throw new HttpException('no autorizado', HttpStatus.UNAUTHORIZED);
     }
-    const payload = { sub: user.id };
+    const payload = { sub: user.id, email: user.email };
 
     const accessToken = this.jwtService.sign(payload);
     return { accessToken };

@@ -14,11 +14,14 @@ export class UserService {
   ) {}
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
+      console.log("lo que llega",createUserDto);
+      
       const salt = await bcrypt.genSalt(10);
       const res = this.userRepository.save({
         email: createUserDto.email.toLowerCase(),
         name: createUserDto.name,
         password: await bcrypt.hash(createUserDto.password, salt),
+        role: createUserDto.role
       });
       if (!res) {
         throw new HttpException(
@@ -26,9 +29,6 @@ export class UserService {
           HttpStatus.BAD_REQUEST,
         );
       }
-
-      console.log(res);
-
       return res; // Aquí se devuelve la instancia de User
     } catch (error) {
       throw new HttpException(
@@ -58,15 +58,10 @@ export class UserService {
     }
   }
   async checkPasswordUpdate(users: User, password?: string): Promise<boolean> {
-    console.log('password comparacion', password, users.password);
     if (!password) {
       return true;
     }
     const res = compareSync(password, users.password);
-
-    console.log('invalidos', res);
-    console.log('es la respuesta', res);
-
     return res;
   }
 
@@ -107,7 +102,6 @@ export class UserService {
   async validateUser(email: string, password: string): Promise<User | null> {
     try {
       const user = await this.userRepository.findOneBy({ email });
-      console.log('usuario encontrado ', user);
 
       if (!user) {
         return null;
