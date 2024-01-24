@@ -11,6 +11,8 @@ import { JwtStrategy } from './auth/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './auth/constaints';
+import { ProjectModule } from './project/project.module';
+import { Project } from './project/entities/project.entity';
 
 @Module({
   imports: [
@@ -36,12 +38,13 @@ import { jwtConstants } from './auth/constaints';
         migrations: ['src/migrations/*.ts'],
         cli: { migrationsDir: 'src/migrations' },
         charset: 'utf8mb4',
-        entities: [User],
+        entities: [User,Project],
       }),
       inject: [ConfigService],
     }),
     UserModule,
     AuthModule,
+    ProjectModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthService, JwtStrategy],

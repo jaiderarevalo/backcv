@@ -2,19 +2,17 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpException,
   HttpStatus,
+  Param,
   Post,
-  UseGuards,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { loginUser } from 'src/user/dto/login-user.dto';
 import { UserService } from 'src/user/user.service';
-import { ROLES_KEY, Roles } from './decorators/roles.decorator';
-import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from './guard/roles.guard';
 import { Role } from 'src/interfaces/role.enum';
 import { Auth } from './decorators/auth.decorator';
 @Controller('auth')
@@ -38,8 +36,8 @@ export class AuthController {
     const payload = { sub: user.id, email: user.email };
     const accessToken = this.jwtservice.sign(payload);
 
-    const { ...rest } = user;
-    return { accessToken, user: rest.email };
+    const { email, role } = user;
+    return { accessToken, email, role };
   }
   @Post('register')
   @Auth(Role.Admin)
@@ -57,5 +55,11 @@ export class AuthController {
 
     const { email, name, role } = user;
     return { email, name, role };
+  }
+
+  @Get(':id')
+  async GetUser(@Param('id') id: string) {
+    const response = await this.userService.getOne(id);
+    return response;
   }
 }
