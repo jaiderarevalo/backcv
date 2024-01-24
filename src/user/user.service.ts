@@ -37,6 +37,21 @@ export class UserService {
       );
     }
   }
+  async getOne(id: string) {
+    try {
+      const response = await this.userRepository.findOne({ where: { id } });
+      if (!response) {
+        throw new HttpException(
+          'no se pudo obtener el usuario',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      return response;
+    } catch (error) {
+      throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
 
   async findEmail(email: string): Promise<User> {
     return await this.userRepository.findOneBy({ email });
