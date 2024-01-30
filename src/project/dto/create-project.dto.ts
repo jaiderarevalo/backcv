@@ -10,6 +10,8 @@ export class CreateProjectDto {
     @IsNotEmpty()
     @IsString()
     skills:string
+    @IsString()
+    repository:string
     @IsNotEmpty()
     @IsString()
     image:string
