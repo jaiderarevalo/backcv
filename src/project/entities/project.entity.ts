@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('Projects')
+@Entity('projects')
 export class Project {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -19,6 +19,8 @@ export class Project {
   skills: string;
   @Column()
   image: string | null;
+  @Column()
+  repository:string
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

@@ -13,6 +13,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './auth/constaints';
 import { ProjectModule } from './project/project.module';
 import { Project } from './project/entities/project.entity';
+import { SkillsModule } from './skills/skills.module';
+import { Skill } from './skills/entities/skill.entity';
 
 @Module({
   imports: [
@@ -38,13 +40,14 @@ import { Project } from './project/entities/project.entity';
         migrations: ['src/migrations/*.ts'],
         cli: { migrationsDir: 'src/migrations' },
         charset: 'utf8mb4',
-        entities: [User,Project],
+        entities: [User,Project,Skill],
       }),
       inject: [ConfigService],
     }),
     UserModule,
     AuthModule,
     ProjectModule,
+    SkillsModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthService, JwtStrategy],
