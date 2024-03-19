@@ -20,7 +20,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "typeorm:seeder:run-dev": "cross-env NODE_ENV=development ts-node ./node_modules/typeorm-seeding/dist/cli.js seed",
     "typeorm:migration:generate": "cross-env NODE_ENV=development npm run typeorm migration:generate ./src/db/typeorm-migrations/migration -- -d  typeOrm-migrations.config.ts",
+    "typeorm:migration:run-dev": "cross-env NODE_ENV=development npm run typeorm migration:run -- -d ./typeOrm-migrations.config.ts",
     "typeorm:migration:run": "cross-env NODE_ENV=development npm run typeorm migration:run -- -d ./typeOrm-migrations.config.ts",
     "typeorm:migration:revert": "cross-env NODE_ENV=development npm run typeorm migration:revert -- -d ./typeOrm-migrations.config.ts"
   },
