@@ -1,0 +1,58 @@
+name: NESTJS DEV CD 🚀
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2 
+          
+      - name: Setup Bun 🥖
+        uses: oven-sh/setup-bun@v1
+
+      - name: Installing dependencies with Bun 📥
+        run: bun install
+
+      - name: Config enviroments
+        run: |
+          echo "" >> .env.development 
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env.development
+          echo "" >> .env.development 
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env.development
+          echo "" >> .env.development 
+          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env.development
+          echo "" >> .env.development 
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env.development
+          echo "" >> .env.development 
+          echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env.development
+
+      - name: Install package
+        run: bun add sharp@0.33.0-alpha.6
+
+      - name: Building project with Bun 🔧
+        run: bun run build:dev
+
+      - name: Deploy to Linux server using rsync
+        run: |
+          echo "${{ secrets.SSH_KEY }}" > deploy_key
+          chmod 600 deploy_key
+          whoami >> deploy_log.txt
+          rsync -avz --delete --exclude 'node_modules' -e 'ssh -i deploy_key -o StrictHostKeyChecking=no' ./ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_FOLDER_PROJECT }}
+          ssh -i deploy_key -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} 'sh ${{ secrets.SSH_FOLDER_POSTDEPLOY_FILE }}'
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+
+      - name: SSH into VPS and execute commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            sh ${{ secrets.SSH_FOLDER_POSTDEPLOY_FILE }}
