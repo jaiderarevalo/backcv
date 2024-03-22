@@ -21,7 +21,7 @@ export class ProjectController {
   @Auth(Role.Admin)
   async create(@Body() createProjectDto: CreateProjectDto) {
     const user = await this.projectService.create(createProjectDto);
-    console.log(user);
+    console.log("soy el user",user);
 
     return user;
   }
