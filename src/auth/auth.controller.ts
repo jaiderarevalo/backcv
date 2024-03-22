@@ -8,6 +8,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
@@ -31,7 +32,7 @@ export class AuthController {
     );
 
     if (!user) {
-      throw new HttpException('', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException();
     }
     const payload = { sub: user.id, email: user.email };
     const accessToken = this.jwtservice.sign(payload);
@@ -62,4 +63,35 @@ export class AuthController {
     const response = await this.userService.getOne(id);
     return response;
   }
+
+
+  @HttpCode(200)
+  @Post('validate-token')
+  async validateToken(@Body() body: { token: string }) {
+    try {
+      const { sub } = this.jwtservice.verify(body.token);
+      const user = await this.userService.findOne(sub);
+      if (!user) {
+        throw new UnauthorizedException();
+      }
+      const { password, ...rest } = user;
+
+      console.log('Validación exitosa:', user);
+
+      return { user: rest, accessToken: body.token };
+    } catch (error) {
+      console.log('el error es ', error);
+
+      // Maneja específicamente los errores de autorización
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Token Expirado');
+      }
+
+      throw new BadRequestException({
+        message: `${error.message || 'Error desconocido'}`,
+      });
+    }
+  }
+
 }
+

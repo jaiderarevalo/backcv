@@ -83,8 +83,6 @@ export class ProjectService {
     return project; // Devuelve la habilidad eliminada si es necesario
   }
   async EditProject(id: string, updateProject: updateProjectDto) {
-    console.log();
-
     try {
       const res = await this.projectRepository.update(id, {
         name: updateProject.name,
@@ -105,7 +103,7 @@ export class ProjectService {
     } catch (error) {
       throw new HttpException(
         `${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.BAD_REQUEST,
       );
     }
   }
