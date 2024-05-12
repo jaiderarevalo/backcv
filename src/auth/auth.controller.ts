@@ -4,8 +4,6 @@ import {
   Controller,
   Get,
   HttpCode,
-  HttpException,
-  HttpStatus,
   Param,
   Post,
   UnauthorizedException,
@@ -14,8 +12,6 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { loginUser } from 'src/user/dto/login-user.dto';
 import { UserService } from 'src/user/user.service';
-import { Role } from 'src/interfaces/role.enum';
-import { Auth } from './decorators/auth.decorator';
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -41,7 +37,6 @@ export class AuthController {
     return { accessToken, email, role };
   }
   @Post('register')
-  @Auth(Role.Admin)
   async create(@Body() createuserdto: CreateUserDto) {
     if (createuserdto.password !== createuserdto.confirmPassword) {
       throw new BadRequestException({
